@@ -1,0 +1,49 @@
+version: '3'
+ 
+services:
+    apache_1:
+        container_name: proxypache_1
+        build:
+          context: ./
+          dockerfile: Dockerfile
+        expose:
+            - 8383/tcp
+#            - ${APACHE_EXPOSED_PORT}
+        networks:
+            public_net:
+                ipv4_address: ${APACHE_1_IP}
+    apache_2:
+        container_name: proxypache_2
+        build:
+          context: ./
+          dockerfile: Dockerfile
+        expose:
+            - 8383/tcp
+#            - ${APACHE_EXPOSED_PORT}
+        networks:
+            public_net:
+                ipv4_address: ${APACHE_2_IP}
+    haproxy_img:
+        build:
+          context: ./
+          dockerfile: Dockerfile
+        ports:
+            - 8383:80
+        expose:
+            - 8383
+        networks:
+            public_net:
+                ipv4_address: ${HA_PROXY_IP}
+        environment:
+            - APACHE_1_IP=${APACHE_1_IP}
+            - APACHE_2_IP=${APACHE_2_IP}
+            - APACHE_EXPOSED_PORT=${APACHE_EXPOSED_PORT}
+networks:
+    public_net:
+        driver: bridge
+#        ipam:
+#            driver: default
+#            config:
+#                - subnet: ${NETWORK_SUBNET}
+#
+
